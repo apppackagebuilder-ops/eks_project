@@ -1,0 +1,28 @@
+# kube-prometheus-stack values provide dashboards, alerts, and service monitors for the demo platform.
+grafana:
+  adminPassword: change-me-in-production
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.dev.example.com
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.dev.example.com
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    serviceMonitorSelectorNilUsesHelmValues: false
+alertmanager:
+  enabled: true
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      receiver: platform-email
+    receivers:
+      - name: platform-email
+        email_configs:
+          - to: platform-team@example.com
+            from: alertmanager@example.com

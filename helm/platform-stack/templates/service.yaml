@@ -1,0 +1,22 @@
+{{- range $name, $app := .Values.applications }}
+{{- if $app.enabled }}
+---
+# Services give each workload a stable virtual IP and DNS name inside Kubernetes.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+{{ include "platform-stack.labels" $ | indent 4 }}
+spec:
+  type: {{ $app.service.type }}
+  selector:
+    app.kubernetes.io/name: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $app.service.port }}
+      targetPort: {{ $app.containerPort }}
+{{- end }}
+{{- end }}

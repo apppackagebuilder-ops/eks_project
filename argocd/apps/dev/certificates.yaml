@@ -1,0 +1,19 @@
+# Development environment certificate resources from the repository.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: certificates-dev
+  namespace: argocd
+spec:
+  project: platform-project
+  source:
+    repoURL: https://github.com/example/acme-eks-platform.git
+    targetRevision: HEAD
+    path: kubernetes/certificates
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

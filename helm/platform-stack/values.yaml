@@ -1,0 +1,224 @@
+# Default Helm values for the platform stack chart.
+namespace: platform
+environment: dev
+commonLabels:
+  team: platform
+
+applications:
+  user-service:
+    enabled: true
+    workloadType: Deployment
+    image: acme/user-service:1.0.0
+    replicaCount: 2
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      cpuUtilization: 70
+  product-service:
+    enabled: true
+    workloadType: Deployment
+    image: acme/product-service:1.0.0
+    replicaCount: 2
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      cpuUtilization: 70
+  order-service:
+    enabled: true
+    workloadType: Deployment
+    image: acme/order-service:1.0.0
+    replicaCount: 2
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+      USER_SERVICE_URL: http://user-service:8080
+      PRODUCT_SERVICE_URL: http://product-service:8080
+      PAYMENT_SERVICE_URL: http://payment-service:8080
+      NOTIFICATION_SERVICE_URL: http://notification-service:8080
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 150m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 6
+      cpuUtilization: 70
+  payment-service:
+    enabled: true
+    workloadType: StatefulSet
+    image: acme/payment-service:1.0.0
+    replicaCount: 1
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+      PAYMENT_DB_PATH: /data/payments.db
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClassName: gp3-encrypted
+      mountPath: /data
+    autoscaling:
+      enabled: false
+  notification-service:
+    enabled: true
+    workloadType: Deployment
+    image: acme/notification-service:1.0.0
+    replicaCount: 2
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+      NOTIFICATION_CHANNEL: email
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      cpuUtilization: 70
+  frontend-ui:
+    enabled: true
+    workloadType: Deployment
+    image: acme/frontend-ui:1.0.0
+    replicaCount: 2
+    containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 8080
+    env:
+      APP_ENV: dev
+      USER_SERVICE_URL: http://user-service:8080
+      PRODUCT_SERVICE_URL: http://product-service:8080
+      ORDER_SERVICE_URL: http://order-service:8080
+      PAYMENT_SERVICE_URL: http://payment-service:8080
+      NOTIFICATION_SERVICE_URL: http://notification-service:8080
+    config: {}
+    secrets: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    probes:
+      liveness:
+        path: /healthz
+      readiness:
+        path: /readyz
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      cpuUtilization: 70
+    ingress:
+      enabled: true
+      className: alb
+      annotations:
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+        alb.ingress.kubernetes.io/ssl-redirect: '443'
+      hosts:
+        - host: acme.dev.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls: []
+
+networkPolicy:
+  enabled: true
+  ingressNamespaces:
+    - ingress-nginx
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

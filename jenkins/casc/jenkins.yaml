@@ -1,0 +1,49 @@
+# Jenkins Configuration as Code keeps controller setup reproducible and auditable.
+jenkins:
+  systemMessage: "ACME Enterprise Jenkins running on Kubernetes"
+  numExecutors: 0
+  mode: EXCLUSIVE
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: change-me-in-production
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  clouds:
+    - kubernetes:
+        name: kubernetes
+        namespace: jenkins
+        jenkinsUrl: http://jenkins.jenkins.svc.cluster.local:8080
+        templates:
+          - name: python-docker
+            label: linux docker
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-1
+              - name: docker
+                image: docker:28.3.2-cli
+                command: cat
+                ttyEnabled: true
+          - name: windows-terraform
+            label: windows terraform
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:3309.v27b_9314fd1a_4-1
+jobs:
+  - script: >
+      multibranchPipelineJob('acme-eks-platform') {
+        branchSources {
+          git {
+            id('acme-eks-platform')
+            remote('https://github.com/example/acme-eks-platform.git')
+          }
+        }
+        factory {
+          workflowBranchProjectFactory {
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }

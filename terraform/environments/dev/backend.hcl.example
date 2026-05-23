@@ -1,0 +1,8 @@
+# Use this file with terraform init to move local state into the remote backend.
+# First create the backend resources from terraform/bootstrap/global.
+
+bucket         = "acme-eks-platform-us-east-1-tfstate"
+key            = "environments/dev/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "acme-eks-platform-terraform-locks"
+encrypt        = true

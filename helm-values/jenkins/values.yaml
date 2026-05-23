@@ -1,0 +1,43 @@
+# Jenkins Helm values tuned for controller-on-Kubernetes with JCasC enabled.
+controller:
+  admin:
+    createSecret: true
+    existingSecret: jenkins-admin
+    userKey: jenkins-admin-user
+    passwordKey: jenkins-admin-password
+  installPlugins:
+    - kubernetes:4296.v20a_7e4d77cf6
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.7.0
+    - github-branch-source:1810.v913311241fa_9
+    - configuration-as-code:1971.ve40e9442c0d0
+    - sonarqube:2.18
+    - dependency-check-jenkins-plugin:5.6.1
+    - slack:741.v30d7d9fefb_48
+    - email-ext:2.108
+  JCasC:
+    defaultConfig: false
+    configScripts:
+      acme-jenkins: |
+        jenkins:
+          systemMessage: "ACME Enterprise Jenkins running on Kubernetes"
+  serviceType: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: jenkins.dev.example.com
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls:
+      - secretName: jenkins-tls
+        hosts:
+          - jenkins.dev.example.com
+agent:
+  enabled: true
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi

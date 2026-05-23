@@ -1,0 +1,19 @@
+# Terraform state and plan output should never be committed.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local environment files.
+.env
+.DS_Store
+Thumbs.db
+
+# IDE and operating-system noise.
+.idea/
+.vscode/*.code-workspace

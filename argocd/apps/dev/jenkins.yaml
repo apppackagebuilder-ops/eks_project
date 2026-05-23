@@ -1,0 +1,25 @@
+# Development environment Jenkins application using the official Helm chart and repo-stored values.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jenkins-dev
+  namespace: argocd
+spec:
+  project: platform-project
+  sources:
+    - repoURL: https://charts.jenkins.io
+      chart: jenkins
+      targetRevision: 5.8.81
+      helm:
+        valueFiles:
+          - $values/helm-values/jenkins/values.yaml
+    - repoURL: https://github.com/example/acme-eks-platform.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jenkins
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

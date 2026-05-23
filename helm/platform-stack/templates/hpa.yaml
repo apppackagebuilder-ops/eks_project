@@ -1,0 +1,25 @@
+{{- range $name, $app := .Values.applications }}
+{{- if and $app.enabled $app.autoscaling.enabled }}
+---
+# Horizontal Pod Autoscalers scale stateless workloads based on observed utilization.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: {{ $app.workloadType }}
+    name: {{ $name }}
+  minReplicas: {{ $app.autoscaling.minReplicas }}
+  maxReplicas: {{ $app.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $app.autoscaling.cpuUtilization }}
+{{- end }}
+{{- end }}

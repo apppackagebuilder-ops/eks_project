@@ -1,0 +1,23 @@
+# Stage environment application for the business microservices chart.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-stage
+  namespace: argocd
+spec:
+  project: platform-project
+  source:
+    repoURL: https://github.com/example/acme-eks-platform.git
+    targetRevision: HEAD
+    path: helm/platform-stack
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-stage.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: platform-stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

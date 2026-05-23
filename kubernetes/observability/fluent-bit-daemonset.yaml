@@ -1,0 +1,29 @@
+# This DaemonSet example makes the DaemonSet primitive explicit for training, even though Helm normally manages Fluent Bit.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit-demo
+  namespace: logging
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit-demo
+  template:
+    metadata:
+      labels:
+        app: fluent-bit-demo
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: fluent-bit
+          image: fluent/fluent-bit:3.1.9
+          env:
+            - name: AWS_REGION
+              value: us-east-1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

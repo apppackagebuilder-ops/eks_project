@@ -1,0 +1,23 @@
+# QA values keep two replicas and a dedicated host name for testing.
+namespace: platform-qa
+environment: qa
+
+applications:
+  frontend-ui:
+    image: acme/frontend-ui:qa
+    ingress:
+      hosts:
+        - host: acme.qa.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+  order-service:
+    image: acme/order-service:qa
+  user-service:
+    image: acme/user-service:qa
+  product-service:
+    image: acme/product-service:qa
+  payment-service:
+    image: acme/payment-service:qa
+  notification-service:
+    image: acme/notification-service:qa

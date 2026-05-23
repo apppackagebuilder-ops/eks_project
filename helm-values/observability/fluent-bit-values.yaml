@@ -1,0 +1,17 @@
+# Fluent Bit values ship application and node logs to both Loki and CloudWatch.
+serviceAccount:
+  create: true
+config:
+  outputs: |
+    [OUTPUT]
+        Name loki
+        Match *
+        Host loki-gateway.logging.svc.cluster.local
+        Port 80
+        Labels job=fluent-bit
+    [OUTPUT]
+        Name cloudwatch_logs
+        Match *
+        region us-east-1
+        log_group_name /eks/acme/platform
+        log_stream_prefix fluent-bit-

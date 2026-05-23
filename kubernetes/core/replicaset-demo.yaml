@@ -1,0 +1,21 @@
+# This ReplicaSet exists for training so beginners can see the lower-level primitive behind a Deployment.
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: static-nginx-demo
+  namespace: platform-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: static-nginx-demo
+  template:
+    metadata:
+      labels:
+        app: static-nginx-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29.0
+          ports:
+            - containerPort: 80

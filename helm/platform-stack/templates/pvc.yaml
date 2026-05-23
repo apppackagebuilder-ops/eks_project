@@ -1,0 +1,18 @@
+{{- range $name, $app := .Values.applications }}
+{{- if and $app.enabled $app.persistence.enabled }}
+---
+# PVCs request durable storage from a StorageClass using dynamic provisioning.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}-data
+  namespace: {{ $.Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $app.persistence.size }}
+  storageClassName: {{ $app.persistence.storageClassName }}
+{{- end }}
+{{- end }}

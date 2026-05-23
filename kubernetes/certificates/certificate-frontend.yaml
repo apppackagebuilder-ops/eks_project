@@ -1,0 +1,14 @@
+# This certificate object requests a TLS certificate for the frontend using cert-manager.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: frontend-ui-certificate
+  namespace: platform-dev
+spec:
+  secretName: frontend-ui-tls
+  commonName: acme.dev.example.com
+  dnsNames:
+    - acme.dev.example.com
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod

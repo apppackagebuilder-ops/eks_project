@@ -1,0 +1,33 @@
+# RBAC example granting read-only access for support engineers in the platform namespace.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: support-viewer
+  namespace: platform-dev
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: support-viewer
+  namespace: platform-dev
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "events"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: support-viewer
+  namespace: platform-dev
+subjects:
+  - kind: ServiceAccount
+    name: support-viewer
+    namespace: platform-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: support-viewer

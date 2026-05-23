@@ -1,0 +1,31 @@
+# Development environment logging application installing Loki and Fluent Bit.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: logging-dev
+  namespace: argocd
+spec:
+  project: platform-project
+  sources:
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: loki
+      targetRevision: 6.39.0
+      helm:
+        valueFiles:
+          - $values/helm-values/observability/loki-values.yaml
+    - repoURL: https://fluent.github.io/helm-charts
+      chart: fluent-bit
+      targetRevision: 0.52.0
+      helm:
+        valueFiles:
+          - $values/helm-values/observability/fluent-bit-values.yaml
+    - repoURL: https://github.com/example/acme-eks-platform.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

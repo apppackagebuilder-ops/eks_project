@@ -1,0 +1,17 @@
+# ArgoCD Helm values with secure defaults and ingress enabled for training demos.
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: argocd.dev.example.com
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls: true
+  extraArgs:
+    - --insecure
+configs:
+  params:
+    server.insecure: true
+  cm:
+    admin.enabled: true
+    application.instanceLabelKey: argocd.argoproj.io/instance

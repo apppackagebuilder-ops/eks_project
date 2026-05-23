@@ -1,0 +1,13 @@
+# Copy this file to terraform.tfvars and adjust values for your account.
+
+project_name = "acme-eks-platform"
+environment  = "global"
+aws_region   = "us-east-1"
+aws_profile  = ""
+force_destroy = false
+
+tags = {
+  CostCenter = "training"
+  Repo       = "eks-project"
+  Owner      = "platform-team"
+}

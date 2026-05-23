@@ -1,0 +1,15 @@
+{{- range $name, $app := .Values.applications }}
+{{- if and $app.enabled $app.config }}
+---
+# ConfigMaps store non-secret configuration for each application.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-config
+  namespace: {{ $.Values.namespace }}
+data:
+{{- range $key, $value := $app.config }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}

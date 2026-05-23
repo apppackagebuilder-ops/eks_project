@@ -1,0 +1,26 @@
+# Prometheus alert rules implement RED metrics and basic golden signal alerting.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: platform-application-alerts
+  namespace: monitoring
+spec:
+  groups:
+    - name: platform.rules
+      rules:
+        - alert: PlatformHighErrorRate
+          expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Application error rate is high
+            description: More than one 5xx request per second has been observed for five minutes.
+        - alert: PlatformHighLatency
+          expr: histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Application latency is high
+            description: P95 latency is above one second for ten minutes.

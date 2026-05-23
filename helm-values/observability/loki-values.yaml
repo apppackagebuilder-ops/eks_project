@@ -1,0 +1,12 @@
+# Loki values define log retention and lightweight storage for the demo environment.
+loki:
+  commonConfig:
+    replication_factor: 1
+  auth_enabled: false
+singleBinary:
+  replicas: 1
+gateway:
+  enabled: true
+monitoring:
+  serviceMonitor:
+    enabled: true

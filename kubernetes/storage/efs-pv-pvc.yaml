@@ -1,0 +1,30 @@
+# This static example shows how an EFS-backed PersistentVolume and claim can be modeled.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: shared-efs-pv
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-shared
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-acmeplatformdev001
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-efs-pvc
+  namespace: platform-dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: efs-shared
+

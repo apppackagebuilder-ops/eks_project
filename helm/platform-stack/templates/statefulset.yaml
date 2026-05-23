@@ -1,0 +1,64 @@
+{{- range $name, $app := .Values.applications }}
+{{- if and $app.enabled (eq $app.workloadType "StatefulSet") }}
+---
+# StatefulSets keep stable network identities and persistent storage for stateful applications.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+{{ include "platform-stack.labels" $ | indent 4 }}
+spec:
+  serviceName: {{ $name }}
+  replicas: {{ $app.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ $name }}
+        environment: {{ $.Values.environment | quote }}
+    spec:
+      serviceAccountName: {{ $name }}
+      containers:
+        - name: {{ $name }}
+          image: {{ $app.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ $app.containerPort }}
+          env:
+{{- range $key, $value := $app.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+{{- end }}
+          resources:
+{{ toYaml $app.resources | indent 12 }}
+          volumeMounts:
+            - name: {{ $name }}-data
+              mountPath: {{ $app.persistence.mountPath }}
+          livenessProbe:
+            httpGet:
+              path: {{ $app.probes.liveness.path }}
+              port: {{ $app.containerPort }}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: {{ $app.probes.readiness.path }}
+              port: {{ $app.containerPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10001
+      volumes:
+        - name: {{ $name }}-data
+          persistentVolumeClaim:
+            claimName: {{ $name }}-data
+{{- end }}
+{{- end }}

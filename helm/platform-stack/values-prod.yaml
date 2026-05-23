@@ -1,0 +1,28 @@
+# Production values emphasize higher availability and stronger scaling thresholds.
+namespace: platform-prod
+environment: prod
+
+applications:
+  frontend-ui:
+    image: acme/frontend-ui:prod
+    replicaCount: 3
+    ingress:
+      hosts:
+        - host: acme.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+  order-service:
+    image: acme/order-service:prod
+    replicaCount: 3
+  user-service:
+    image: acme/user-service:prod
+    replicaCount: 3
+  product-service:
+    image: acme/product-service:prod
+    replicaCount: 3
+  payment-service:
+    image: acme/payment-service:prod
+  notification-service:
+    image: acme/notification-service:prod
+    replicaCount: 3

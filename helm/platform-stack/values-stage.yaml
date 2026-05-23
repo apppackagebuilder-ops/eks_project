@@ -1,0 +1,23 @@
+# Stage values closely mirror production before a release goes live.
+namespace: platform-stage
+environment: stage
+
+applications:
+  frontend-ui:
+    image: acme/frontend-ui:stage
+    ingress:
+      hosts:
+        - host: acme.stage.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+  order-service:
+    image: acme/order-service:stage
+  user-service:
+    image: acme/user-service:stage
+  product-service:
+    image: acme/product-service:stage
+  payment-service:
+    image: acme/payment-service:stage
+  notification-service:
+    image: acme/notification-service:stage

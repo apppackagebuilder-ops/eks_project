@@ -1,0 +1,23 @@
+# Development values tuned for a low-cost but production-shaped demo environment.
+namespace: platform-dev
+environment: dev
+
+applications:
+  frontend-ui:
+    image: acme/frontend-ui:dev
+    ingress:
+      hosts:
+        - host: acme.dev.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+  order-service:
+    image: acme/order-service:dev
+  user-service:
+    image: acme/user-service:dev
+  product-service:
+    image: acme/product-service:dev
+  payment-service:
+    image: acme/payment-service:dev
+  notification-service:
+    image: acme/notification-service:dev

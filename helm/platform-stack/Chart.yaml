@@ -1,0 +1,7 @@
+# Reusable Helm chart for the ACME demo microservices platform.
+apiVersion: v2
+name: platform-stack
+description: Enterprise training chart for deploying the ACME demo microservices platform.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
